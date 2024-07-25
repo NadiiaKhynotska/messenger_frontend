@@ -17,14 +17,14 @@ const authService = {
         return data.user
     },
 
-    async refresh():Promise<void>{
-        const refresh = this.getRefreshToken();
-        const {data} = await apiService.post<ITokens>(urls.auth.refresh);
-        this.setTokens(data)
+    async logout(): Promise<void> {
+        await apiService.post<void>(urls.auth.logout);
+        this.deleteTokens()
     },
 
-    me(): IRes<IUser> {
-        return apiService.get(urls.users.findMe)
+    async refresh():Promise<void>{
+        const {data} = await apiService.post<ITokens>(urls.auth.refresh);
+        this.setTokens(data)
     },
     setTokens({accessToken, refreshToken}: ITokens): void {
         localStorage.setItem(accessTokenKey, accessToken)

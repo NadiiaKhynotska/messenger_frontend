@@ -1,11 +1,24 @@
+
+import {authReducer, userReducer} from "./slices";
 import {configureStore} from "@reduxjs/toolkit";
-import {authReducer} from "./slices/authSlice";
+
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
-    }
-})
+        user: userReducer,
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: {
+            // Ignore these action types
+            ignoredActions: ['authSlice/findMe/fulfilled'],
+            // Ignore these field paths in all actions
+            ignoredActionPaths: ['meta.arg', 'payload.headers'],
+            // Ignore these paths in the state
+            ignoredPaths: ['auth.me.headers'],
+        },
+    }),
+});
 
 type RootState = ReturnType<typeof store.getState>
 type AppDispatch = typeof store.dispatch
