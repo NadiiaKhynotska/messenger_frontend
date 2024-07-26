@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, isFulfilled, isRejected } from "@reduxjs/toolkit";
 import { IAuth, IUser } from "../../interfaces";
-import { authService } from "../../services/authService";
 import { AxiosError } from "axios";
-import { userService } from "../../services/userService";
+import {authService, userService} from "../../services";
+
 
 interface IState {
     errors: {
@@ -58,7 +58,7 @@ const findMe = createAsyncThunk<IUser, void>(
     async (_, { rejectWithValue }) => {
         try {
             const response = await userService.findMe();
-            return response.data; // Return the actual user data
+            return response.data;
         } catch (e) {
             const err = e as AxiosError;
             return rejectWithValue(err.response?.data);

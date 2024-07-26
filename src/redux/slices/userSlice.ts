@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, isFulfilled, isRejected } from "@reduxjs/toolkit";
 import { IPagination, IUser } from "../../interfaces";
 import { AxiosError } from "axios";
-import { userService } from "../../services/userService";
+import { userService } from "../../services";
 
 interface IState {
     me: IUser | null;

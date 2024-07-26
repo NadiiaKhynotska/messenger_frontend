@@ -1,21 +1,20 @@
-import React, {FC, PropsWithChildren} from 'react';
-import {IUser} from "../../interfaces";
-import {Button, Card, CardActions, CardContent, Typography} from "@mui/material";
-import {useNavigate} from "react-router-dom";
+import React, { FC, PropsWithChildren } from 'react';
+import { IUser } from "../../interfaces";
+import { Button, Card, CardActions, CardContent, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface IProps extends PropsWithChildren {
     user: IUser;
 }
 
-
-const UserComponent: FC<IProps>  = ({user}) => {
+const UserComponent: FC<IProps> = ({ user }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate('/chat')
+        navigate('/chat', { state: { user, recipientId:user.id  } });
     };
-    return (
 
+    return (
         <Card sx={{ maxWidth: 345 }}>
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
@@ -34,4 +33,4 @@ const UserComponent: FC<IProps>  = ({user}) => {
     );
 };
 
-export {UserComponent};
+export { UserComponent };

@@ -2,8 +2,8 @@ import React, {useEffect} from 'react';
 import {AppBar, Button, Stack, Typography} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../hooks";
-import {authActions, userActions} from "../../redux/slices";
-import {authService} from "../../services/authService";
+import {authActions} from "../../redux/slices";
+import {authService} from "../../services";
 
 const Header = () => {
 

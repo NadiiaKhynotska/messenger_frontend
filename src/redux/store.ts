@@ -1,12 +1,14 @@
 
 import {authReducer, userReducer} from "./slices";
 import {configureStore} from "@reduxjs/toolkit";
+import {messageReducer} from "./slices/messageSlice";
 
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
         user: userReducer,
+        message: messageReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: {

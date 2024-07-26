@@ -1,5 +1,5 @@
 export interface IMessage{
-    id: string;
+    id?: string;
 
     text: string;
 
@@ -8,4 +8,15 @@ export interface IMessage{
     sender_id: string;
 
     recipient_id: string;
+}
+
+export interface IMessageUpdate {
+    text?: string;
+
+    attachments?: null | string[];
+}
+export interface INewMessage  {
+    text: string;
+
+    attachments: null | string[];
 }

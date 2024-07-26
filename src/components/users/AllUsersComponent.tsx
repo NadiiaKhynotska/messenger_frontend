@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from "../../hooks";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import { useSearchParams} from "react-router-dom";
 import {userActions} from "../../redux/slices";
 import {UserComponent} from "./UserComponent";
 import {Container, Grid, Typography} from "@mui/material";
@@ -8,7 +8,6 @@ import {Container, Grid, Typography} from "@mui/material";
 const AllUsersComponent = () => {
     const {allUsers} = useAppSelector(state => state.user);
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const [query, setQuery] = useSearchParams({limit: '10', offset: '0'});
     const limit = +query.get('limit')
     const offset = +query.get('offset')
