@@ -1,27 +1,34 @@
-import { createAsyncThunk, createSlice, isFulfilled, isRejected } from '@reduxjs/toolkit';
-import {IMessage, IMessageUpdate, INewMessage} from '../../interfaces';
-import { messageService } from '../../services';
-import { AxiosError } from 'axios';
+import {createAsyncThunk, createSlice, isFulfilled, isRejected, PayloadAction} from '@reduxjs/toolkit';
+import {IMessage, IMessageUpdate, INewMessage, IPagination} from '../../interfaces';
+import {messageService} from '../../services';
+import {AxiosError} from 'axios';
 
 interface IState {
-    messages: IMessage[];
+    messages: IPagination<IMessage> | null;
     errors: {
         messages?: string[];
         detail?: string;
-    };
+    } | null;
+    messageForUpdate: IMessageUpdate,
 }
 
 const initialState: IState = {
-    messages: [],
+    messages: null,
     errors: null,
+    messageForUpdate: null,
 };
 
-const postMessage = createAsyncThunk<IMessage[], { recipient_id: string; message: INewMessage }>(
+const postMessage = createAsyncThunk<void, {
+    recipient_id: string;
+    message: INewMessage,
+    limit: number,
+    offset: number
+}>(
     'messageSlice/postMessage',
-    async ({ recipient_id, message }, { rejectWithValue,dispatch }) => {
+    async ({recipient_id, message, limit, offset}, {rejectWithValue, dispatch}) => {
         try {
             await messageService.postMessage(recipient_id, message);
-            await dispatch(getAllMessages())
+            await dispatch(getAllMessages({limit, offset, recipientId:recipient_id}))
         } catch (e) {
             const err = e as AxiosError;
             return rejectWithValue(err.response.data);
@@ -29,24 +36,32 @@ const postMessage = createAsyncThunk<IMessage[], { recipient_id: string; message
     }
 );
 
-const getAllMessages = createAsyncThunk<IMessage[], void>(
+const getAllMessages = createAsyncThunk<{ data: IPagination<IMessage> }, {recipientId:string, limit: number, offset: number }>(
     'messageSlice/getAllMessages',
-    async (_, { rejectWithValue }) => {
-        try {
-            const data = await messageService.getAllMessages();
-            return data.messages
-        } catch (e) {
-            const err = e as AxiosError;
-            return rejectWithValue(err.response.data);
-        }
+    async ({limit, offset, recipientId}, {rejectWithValue}) => {
+            try {
+                const response = await messageService.getAllMessages(limit, offset,recipientId);
+                console.log('Response from getAllMessages:', response.data);  // Log the response
+                return { data: response.data };
+            } catch (e) {
+                const err = e as AxiosError;
+                console.error('Error in getAllMessages:', err.response?.data);  // Log the error
+                return rejectWithValue(err.response.data);
+            }
     }
 );
 
-const updateMessage = createAsyncThunk<IMessage, { message_id: string; messageUpdate: IMessageUpdate }>(
+const updateMessage = createAsyncThunk<void, {
+    message_id: string;
+    messageUpdate: IMessageUpdate,
+    limit: number,
+    offset: number
+}>(
     'messageSlice/updateMessage',
-    async ({ message_id, messageUpdate }, { rejectWithValue }) => {
+    async ({message_id, messageUpdate, limit, offset}, {rejectWithValue, dispatch}) => {
         try {
-            return await messageService.updateMessage(message_id, messageUpdate);
+            await messageService.updateMessage(message_id, messageUpdate);
+            // await dispatch(getAllMessages({limit, offset}))
         } catch (e) {
             const err = e as AxiosError;
             return rejectWithValue(err.response.data);
@@ -54,11 +69,12 @@ const updateMessage = createAsyncThunk<IMessage, { message_id: string; messageUp
     }
 );
 
-const deleteMessage = createAsyncThunk<void, { message_id: string }>(
+const deleteMessage = createAsyncThunk<void, { message_id: string, limit: number, offset: number }>(
     'messageSlice/deleteMessage',
-    async ({ message_id }, { rejectWithValue }) => {
+    async ({message_id, limit, offset}, {rejectWithValue, dispatch}) => {
         try {
-            return await messageService.deleteMessage(message_id);
+            await messageService.deleteMessage(message_id);
+            // await dispatch(getAllMessages({limit, offset}))
         } catch (e) {
             const err = e as AxiosError;
             return rejectWithValue(err.response.data);
@@ -69,29 +85,25 @@ const deleteMessage = createAsyncThunk<void, { message_id: string }>(
 const messageSlice = createSlice({
     name: 'messageSlice',
     initialState,
-    reducers: {},
+    reducers: {
+        setMessageForUpdate: (state, action: PayloadAction<{ message: IMessageUpdate }>) => {
+            state.messageForUpdate = action.payload.message
+        }
+    },
     extraReducers: builder => builder
-        .addCase(postMessage.fulfilled, (state, action) => {
-            state.messages = action.payload
-        })
         .addCase(getAllMessages.fulfilled, (state, action) => {
-            state.messages = action.payload;
+            console.log('State after getAllMessages fulfilled:', action.payload.data);  // Log the state
+            state.messages = action.payload.data;
         })
-        .addCase(updateMessage.fulfilled, (state, action) => {
-            const index = state.messages.findIndex(m => m.id === action.payload.id);
-            if (index !== -1) {
-                state.messages[index] = action.payload;
-            }
-        })
-        .addCase(deleteMessage.fulfilled, (state, action) => {
-            state.messages = state.messages.filter(m => m.id !== action.meta.arg.message_id);
+        .addCase(updateMessage.fulfilled, (state) => {
+            state.messageForUpdate = null;
         })
         .addMatcher(isRejected(), (state, action) => {
             state.errors = action.payload;
+            console.error('Error:', action.payload);  // Log the error
         })
         .addMatcher(isFulfilled(), state => {
-            state.errors = null;
-        })
+            state.errors = null;})
 });
 
 const { reducer: messageReducer, actions } = messageSlice;

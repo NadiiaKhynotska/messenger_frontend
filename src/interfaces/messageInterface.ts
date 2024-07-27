@@ -11,6 +11,8 @@ export interface IMessage{
 }
 
 export interface IMessageUpdate {
+    id?: string;
+
     text?: string;
 
     attachments?: null | string[];
