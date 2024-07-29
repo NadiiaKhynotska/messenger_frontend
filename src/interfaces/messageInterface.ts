@@ -3,7 +3,7 @@ export interface IMessage{
 
     text: string;
 
-    attachments: null | string[];
+    attachments:null | string[];
 
     sender_id: string;
 

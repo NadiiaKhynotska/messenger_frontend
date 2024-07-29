@@ -41,11 +41,9 @@ const getAllMessages = createAsyncThunk<{ data: IPagination<IMessage> }, {recipi
     async ({limit, offset, recipientId}, {rejectWithValue}) => {
             try {
                 const response = await messageService.getAllMessages(limit, offset,recipientId);
-                console.log('Response from getAllMessages:', response.data);  // Log the response
                 return { data: response.data };
             } catch (e) {
                 const err = e as AxiosError;
-                console.error('Error in getAllMessages:', err.response?.data);  // Log the error
                 return rejectWithValue(err.response.data);
             }
     }
@@ -61,7 +59,6 @@ const updateMessage = createAsyncThunk<void, {
     async ({message_id, messageUpdate, limit, offset}, {rejectWithValue, dispatch}) => {
         try {
             await messageService.updateMessage(message_id, messageUpdate);
-            // await dispatch(getAllMessages({limit, offset}))
         } catch (e) {
             const err = e as AxiosError;
             return rejectWithValue(err.response.data);
@@ -74,7 +71,6 @@ const deleteMessage = createAsyncThunk<void, { message_id: string, limit: number
     async ({message_id, limit, offset}, {rejectWithValue, dispatch}) => {
         try {
             await messageService.deleteMessage(message_id);
-            // await dispatch(getAllMessages({limit, offset}))
         } catch (e) {
             const err = e as AxiosError;
             return rejectWithValue(err.response.data);
@@ -92,7 +88,6 @@ const messageSlice = createSlice({
     },
     extraReducers: builder => builder
         .addCase(getAllMessages.fulfilled, (state, action) => {
-            console.log('State after getAllMessages fulfilled:', action.payload.data);  // Log the state
             state.messages = action.payload.data;
         })
         .addCase(updateMessage.fulfilled, (state) => {
@@ -100,7 +95,6 @@ const messageSlice = createSlice({
         })
         .addMatcher(isRejected(), (state, action) => {
             state.errors = action.payload;
-            console.error('Error:', action.payload);  // Log the error
         })
         .addMatcher(isFulfilled(), state => {
             state.errors = null;})
@@ -116,3 +110,4 @@ const messageActions = {
 };
 
 export { messageReducer, messageActions };
+

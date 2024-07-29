@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IMessage } from '../../interfaces';
+import {IMessage, IMessageUpdate} from '../../interfaces';
 import { useAppDispatch } from '../../hooks';
-import { messageActions } from '../../redux/slices/messageSlice';
+import { messageActions } from '../../redux/slices';
 
 interface MessageItemProps {
     message: IMessage;
@@ -14,8 +14,13 @@ interface MessageItemProps {
 const MessageComponent: React.FC<MessageItemProps> = ({ message, userId }) => {
     const dispatch = useAppDispatch();
 
-    const handleEditMessage = () => {
-        dispatch(messageActions.setMessageForUpdate({ message: { id: message.id, text: message.text, attachments: [] } }));
+    const handleEditMessage = (msg :IMessageUpdate) => {
+        const messageUpdate = {
+            id: msg.id,
+            text: msg.text,
+            attachments: msg.attachments
+        };
+        dispatch(messageActions.setMessageForUpdate({ message: messageUpdate }));
     };
 
     const handleDeleteMessage = () => {
@@ -27,7 +32,7 @@ const MessageComponent: React.FC<MessageItemProps> = ({ message, userId }) => {
             <Typography variant="body2" color="text.secondary">
                 {message.sender_id === userId ? 'User' : 'Me'}: {message.text}
             </Typography>
-            <IconButton onClick={handleEditMessage}>
+            <IconButton onClick={() => handleEditMessage(message)}>
                 <EditIcon fontSize="small" />
             </IconButton>
             <IconButton onClick={handleDeleteMessage}>
@@ -37,4 +42,4 @@ const MessageComponent: React.FC<MessageItemProps> = ({ message, userId }) => {
     );
 };
 
-export {MessageComponent};
+export { MessageComponent };

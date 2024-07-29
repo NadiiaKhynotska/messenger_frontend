@@ -10,7 +10,7 @@ const router = createBrowserRouter([
         children:[
             {
                 index: true,
-                element:<Navigate to={'all-users'}/>
+                element:<Navigate to={'login'}/>
             },
             {
                 path: 'registration',

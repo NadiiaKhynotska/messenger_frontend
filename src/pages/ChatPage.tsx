@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import {ChatComponent} from "../components/chat/ChatComponent";
+import {ChatComponent} from "../components";
 
 
 const ChatPage: React.FC = () => {
